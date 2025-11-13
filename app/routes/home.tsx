@@ -215,7 +215,7 @@ export default function Home({}: Route.ComponentProps) {
             File System Access + Canvas
           </p>
           <h1 className="text-3xl font-semibold leading-tight">
-            ローカルPNG/WebPコンバーター
+            ローカル画像WebPコンバーター
           </h1>
           <p className="text-base text-gray-600 dark:text-gray-300">
             ブラウザだけでディレクトリ内の画像を読み込み、Canvas で PNG / JPG と
