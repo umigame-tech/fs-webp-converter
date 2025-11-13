@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Route } from "./+types/home";
 
 type ImageEntry = {
@@ -70,9 +70,13 @@ export default function Home({}: Route.ComponentProps) {
   const [logs, setLogs] = useState<string[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
+  const [canUseFsApi, setCanUseFsApi] = useState(false);
 
-  const canUseFsApi =
-    typeof window !== "undefined" && "showDirectoryPicker" in window;
+  useEffect(() => {
+    setCanUseFsApi(
+      typeof window !== "undefined" && !!window.showDirectoryPicker,
+    );
+  }, []);
 
   const pngCount = useMemo(
     () =>
