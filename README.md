@@ -1,79 +1,47 @@
-# Welcome to React Router!
+# FS WebP Converter
 
-A modern, production-ready template for building full-stack React applications using React Router.
+ローカルディレクトリ内の PNG / JPG / WebP を File System Access API と Canvas だけで相互変換できる Web ツールです。サーバーへファイルを送信しないため、プライバシーを保ちながら圧縮やフォーマット統一を行えます。
 
-## Features
+## 機能ハイライト
+- **ディレクトリ単位の操作**: ブラウザから任意フォルダを選択し、PNG・JPG・WebPをスキャンして件数/サイズを一覧表示。
+- **Canvas 経由の変換**: `createImageBitmap` と `<canvas>.toBlob()` を用いてブラウザ内でエンコード。PNG⇄WebP、JPG⇄WebP の双方向に対応。
+- **ログと進捗表示**: 変換中のステータスと成功/失敗ログを即時フィードバック。
+- **Cloudflare Workers 対応**: React Router v7 + Vite 構成をそのまま Workers へデプロイ可能。
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+## 必要環境
+- Node.js 20+
+- Chromium 系ブラウザ (Chrome, Edge, Arc など) ※ File System Access API が必要
+- Cloudflare アカウント (Workers へデプロイする場合)
 
-## Getting Started
-
-### Installation
-
-Install the dependencies:
-
+## セットアップ
 ```bash
+git clone <repo-url>
+cd fs-webp-converter
 npm install
 ```
 
-### Development
+## 開発・ビルドコマンド
+| コマンド | 説明 |
+| --- | --- |
+| `npm run dev` | React Router の開発サーバーを起動 (HMR 対応) |
+| `npm run typecheck` | `wrangler types` + React Router typegen + `tsc -b` を実行 |
+| `npm run build` | 本番ビルドと Workers バンドルを生成 |
+| `npm run preview` | 生成済みビルドをローカルサーバーで確認 |
+| `npm run deploy` | `build` 後に `wrangler deploy` を実行 |
 
-Start the development server with HMR:
+## 使い方
+1. `npm run dev` を起動し、`http://localhost:5173` を Chromium で開く。
+2. 「ディレクトリを選択」を押して、変換したい画像が入ったフォルダを選ぶ。初回は読取/書込の権限付与が必要。
+3. 一覧に読み込まれたファイルを確認し、目的の変換ボタン (例: `JPG → WebP`) をクリック。
+4. 変換が完了すると同ディレクトリ内に新しいファイルが出力され、ログに処理結果が表示される。
 
-```bash
-npm run dev
-```
+## プロジェクト構成
+- `app/` – ルーティング、UI、変換ロジックを含む React Router アプリ本体。
+- `public/` – `ogp.webp` などの静的アセット。
+- `workers/`, `wrangler.jsonc` – Cloudflare Workers のエントリーポイントと設定。
+- 主要設定: `vite.config.ts`, `react-router.config.ts`, `tsconfig*.json`
 
-Your application will be available at `http://localhost:5173`.
-
-## Previewing the Production Build
-
-Preview the production build locally:
-
-```bash
-npm run preview
-```
-
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
-```
-
-## Deployment
-
-Deployment is done using the Wrangler CLI.
-
-To build and deploy directly to production:
-
-```sh
-npm run deploy
-```
-
-To deploy a preview URL:
-
-```sh
-npx wrangler versions upload
-```
-
-You can then promote a version to production after verification or roll it out progressively.
-
-```sh
-npx wrangler versions deploy
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+## 注意事項
+- File System Access API 非対応ブラウザでは機能しません。
+- 大容量画像は Canvas 変換に時間がかかる場合があります。処理中はブラウザタブを閉じないでください。
+- 追加形式や品質パラメータを変更したい場合は `app/routes/home.tsx` 内の `DIRECTION_CONFIG` と `canvasToBlob` を編集してください。
