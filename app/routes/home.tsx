@@ -223,9 +223,24 @@ export default function Home({}: Route.ComponentProps) {
     <main className="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
       <div className="mx-auto flex max-w-4xl flex-col gap-10 px-4 py-12">
         <header className="space-y-3">
-          <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-            File System Access + Canvas
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+              File System Access + Canvas
+            </p>
+            <a
+              href="https://github.com/umigame-tech/fs-webp-converter"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 rounded-full bg-gray-900 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-white"
+            >
+              <img
+                src="/github-mark-white.svg"
+                alt="GitHub"
+                className="h-4 w-4 dark:invert"
+              />
+              GitHub
+            </a>
+          </div>
           <h1 className="text-3xl font-semibold leading-tight">
             ローカル画像WebPコンバーター
           </h1>
