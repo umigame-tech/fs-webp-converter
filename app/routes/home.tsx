@@ -24,6 +24,10 @@ type ConversionConfig = {
   label: string;
 };
 
+const SITE_TITLE = "FS WebP Converter";
+const SITE_DESCRIPTION =
+  "File System Access API と Canvas で PNG / JPG / WebP を相互変換するローカルツール。";
+
 const DIRECTION_CONFIG: Record<ConversionDirection, ConversionConfig> = {
   "png-to-webp": {
     sourceExts: [".png"],
@@ -53,12 +57,16 @@ const DIRECTION_CONFIG: Record<ConversionDirection, ConversionConfig> = {
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "FS WebP Converter" },
-    {
-      name: "description",
-      content:
-        "File System Access API と Canvas で PNG / JPG / WebP を相互変換するローカルツール。",
-    },
+    { title: SITE_TITLE },
+    { name: "description", content: SITE_DESCRIPTION },
+    { property: "og:type", content: "website" },
+    { property: "og:title", content: SITE_TITLE },
+    { property: "og:description", content: SITE_DESCRIPTION },
+    { property: "og:image", content: "https://webp.umigame.app/ogp.webp" },
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: SITE_TITLE },
+    { name: "twitter:description", content: SITE_DESCRIPTION },
+    { name: "twitter:image", content: "https://webp.umigame.app/ogp.webp" },
   ];
 }
 
