@@ -9,25 +9,45 @@ type ImageEntry = {
   lastModified: number;
 };
 
-type ConversionDirection = "png-to-webp" | "webp-to-png";
+type ConversionDirection =
+  | "png-to-webp"
+  | "webp-to-png"
+  | "jpg-to-webp"
+  | "webp-to-jpg";
 
-const SUPPORTED_MIME_TYPES = new Set(["image/png", "image/webp"]);
+const SUPPORTED_MIME_TYPES = new Set(["image/png", "image/webp", "image/jpeg"]);
 
-const DIRECTION_CONFIG: Record<
-  ConversionDirection,
-  { sourceExt: string; targetExt: string; mime: string; label: string }
-> = {
+type ConversionConfig = {
+  sourceExts: string[];
+  targetExt: string;
+  mime: string;
+  label: string;
+};
+
+const DIRECTION_CONFIG: Record<ConversionDirection, ConversionConfig> = {
   "png-to-webp": {
-    sourceExt: ".png",
+    sourceExts: [".png"],
     targetExt: ".webp",
     mime: "image/webp",
     label: "PNG → WebP",
   },
   "webp-to-png": {
-    sourceExt: ".webp",
+    sourceExts: [".webp"],
     targetExt: ".png",
     mime: "image/png",
     label: "WebP → PNG",
+  },
+  "jpg-to-webp": {
+    sourceExts: [".jpg", ".jpeg"],
+    targetExt: ".webp",
+    mime: "image/webp",
+    label: "JPG → WebP",
+  },
+  "webp-to-jpg": {
+    sourceExts: [".webp"],
+    targetExt: ".jpg",
+    mime: "image/jpeg",
+    label: "WebP → JPG",
   },
 };
 
@@ -37,7 +57,7 @@ export function meta({}: Route.MetaArgs) {
     {
       name: "description",
       content:
-        "File System Access API と Canvas で PNG / WebP を相互変換するローカルツール。",
+        "File System Access API と Canvas で PNG / JPG / WebP を相互変換するローカルツール。",
     },
   ];
 }
@@ -57,6 +77,14 @@ export default function Home({}: Route.ComponentProps) {
   const pngCount = useMemo(
     () =>
       images.filter((image) => hasExtension(image.name, ".png")).length,
+    [images],
+  );
+
+  const jpgCount = useMemo(
+    () =>
+      images.filter((image) =>
+        hasAnyExtension(image.name, [".jpg", ".jpeg"]),
+      ).length,
     [images],
   );
 
@@ -131,7 +159,7 @@ export default function Home({}: Route.ComponentProps) {
 
       const config = DIRECTION_CONFIG[direction];
       const targets = images.filter((file) =>
-        hasExtension(file.name, config.sourceExt),
+        hasAnyExtension(file.name, config.sourceExts),
       );
 
       if (!targets.length) {
@@ -190,8 +218,8 @@ export default function Home({}: Route.ComponentProps) {
             ローカルPNG/WebPコンバーター
           </h1>
           <p className="text-base text-gray-600 dark:text-gray-300">
-            ブラウザだけでディレクトリ内の画像を読み込み、Canvas で PNG と WebP
-            を相互変換します。データはローカルから出ません。
+            ブラウザだけでディレクトリ内の画像を読み込み、Canvas で PNG / JPG と
+            WebP を相互変換します。データはローカルから出ません。
           </p>
         </header>
 
@@ -234,6 +262,10 @@ export default function Home({}: Route.ComponentProps) {
                 <dd>{pngCount} 件</dd>
               </div>
               <div className="flex justify-between">
+                <dt className="font-medium">JPG ファイル</dt>
+                <dd>{jpgCount} 件</dd>
+              </div>
+              <div className="flex justify-between">
                 <dt className="font-medium">WebP ファイル</dt>
                 <dd>{webpCount} 件</dd>
               </div>
@@ -271,6 +303,26 @@ export default function Home({}: Route.ComponentProps) {
                 className="rounded-xl bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-500 disabled:cursor-not-allowed disabled:bg-purple-300"
               >
                 WebP → PNG
+              </button>
+              <button
+                type="button"
+                onClick={() => handleConversion("jpg-to-webp")}
+                disabled={
+                  !directoryHandle || jpgCount === 0 || isScanning || isConverting
+                }
+                className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-500 disabled:cursor-not-allowed disabled:bg-orange-300"
+              >
+                JPG → WebP
+              </button>
+              <button
+                type="button"
+                onClick={() => handleConversion("webp-to-jpg")}
+                disabled={
+                  !directoryHandle || webpCount === 0 || isScanning || isConverting
+                }
+                className="rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-500"
+              >
+                WebP → JPG
               </button>
             </div>
             {isConverting && (
@@ -330,6 +382,10 @@ export default function Home({}: Route.ComponentProps) {
 
 function hasExtension(name: string, extension: string) {
   return name.toLowerCase().endsWith(extension);
+}
+
+function hasAnyExtension(name: string, extensions: string[]) {
+  return extensions.some((ext) => hasExtension(name, ext));
 }
 
 function replaceExtension(fileName: string, nextExtension: string) {
